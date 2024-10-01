@@ -1,0 +1,75 @@
+//
+//  SocketClient.swift
+//  SensorTracker
+//
+//  Created by Vasco Xu on 3/6/24.
+//
+
+import Foundation
+import Network
+
+class SocketClient {
+    
+    let host: NWEndpoint.Host
+    let port: NWEndpoint.Port
+    var deviceID: String
+    var connection: NWConnection!
+    let queue = DispatchQueue.global()
+    
+    init(ip: String, portInt: UInt16, deviceID: String, completion: @escaping (Bool) -> Void) {
+        host = NWEndpoint.Host(ip)
+        port = NWEndpoint.Port(integerLiteral: portInt)
+        self.deviceID = deviceID
+        startNewConnection(completion: completion)
+        send(text: "client initialized")
+    }
+    
+    private func startNewConnection(completion: @escaping (Bool) -> Void) {
+        connection = NWConnection(host: host, port: port, using: .udp)
+        connection.stateUpdateHandler = { (newState) in
+            switch newState {
+            case .ready:
+                completion(true)
+            default:
+                completion(false)
+            }
+        }
+        connection.start(queue: queue)
+        // receive(on: connection)
+    }
+    
+    func receive(on connection: NWConnection) {
+        connection.receive(minimumIncompleteLength: 0, maximumLength: Int(UInt32.max)) {(data, _, _, error) in
+            if let data = data {
+                let text = String(data: data, encoding: .utf8)!
+                print("received \(text)")
+            } else {
+                print("\(#function), Received data is nil")
+            }
+        }
+    }
+    
+    func send(text: String, _ completion: (() -> Void)? = nil) {
+        let data = ("\(deviceID);" + text).data(using: .utf8)!
+        connection.send(content: data, completion: .contentProcessed {(error) in
+            if let error = error {
+                print("\(#function), \(error)")
+            } else {
+                  // print("send \(text)")
+                if let completion = completion {
+                    completion()
+                }
+            }
+        })
+    }
+    
+    func stop() {
+        send(text: "stop") { [self] in
+            connection.cancel()
+        }
+    }
+    
+    func restart(completion: @escaping (Bool) -> Void) {
+        startNewConnection(completion: completion)
+    }
+}

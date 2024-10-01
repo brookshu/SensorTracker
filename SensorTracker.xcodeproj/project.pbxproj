@@ -50,6 +50,11 @@
 			path = "SensorTracker Watch App";
 			sourceTree = "<group>";
 		};
+		9715778C2CABB82D003B6C4D /* Shared */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Shared;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -73,6 +78,7 @@
 		9715774B2CAB7DE8003B6C4D = {
 			isa = PBXGroup;
 			children = (
+				9715778C2CABB82D003B6C4D /* Shared */,
 				971577562CAB7DE8003B6C4D /* SensorTracker */,
 				971577682CAB7DF5003B6C4D /* SensorTracker Watch App */,
 				971577552CAB7DE8003B6C4D /* Products */,
@@ -107,6 +113,7 @@
 			);
 			fileSystemSynchronizedGroups = (
 				971577562CAB7DE8003B6C4D /* SensorTracker */,
+				9715778C2CABB82D003B6C4D /* Shared */,
 			);
 			name = SensorTracker;
 			packageProductDependencies = (
@@ -129,6 +136,7 @@
 			);
 			fileSystemSynchronizedGroups = (
 				971577682CAB7DF5003B6C4D /* SensorTracker Watch App */,
+				9715778C2CABB82D003B6C4D /* Shared */,
 			);
 			name = "SensorTracker Watch App";
 			packageProductDependencies = (
@@ -337,6 +345,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "SensorTracker Watch App/SensorTracker Watch App.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"SensorTracker Watch App/Preview Content\"";
@@ -344,6 +353,9 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = SensorTracker;
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "This app needs access to HealthKit to read your health data like heart rate during workouts.";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "This app needs access to HealthKit to log and manage your workouts.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = VascoXu.SensorTracker;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -367,6 +379,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "SensorTracker Watch App/SensorTracker Watch App.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"SensorTracker Watch App/Preview Content\"";
@@ -374,6 +387,9 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = SensorTracker;
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "This app needs access to HealthKit to read your health data like heart rate during workouts.";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "This app needs access to HealthKit to log and manage your workouts.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = VascoXu.SensorTracker;
 				LD_RUNPATH_SEARCH_PATHS = (
