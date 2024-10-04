@@ -100,9 +100,6 @@ struct ContentView: View {
             // Initialize the picker with the current sampling rate
             self.samplingRate = connectivityManager.samplingRate
         }
-        .alert(isPresented: $showAlert) {
-            Alert(title: Text("Sampling Rate"), message: Text(alertMessage), dismissButton: .default(Text("OK")))
-        }
 
         Spacer()
     }
