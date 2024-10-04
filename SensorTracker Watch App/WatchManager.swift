@@ -80,5 +80,14 @@ class WatchConnectivityManager: NSObject, ObservableObject, WCSessionDelegate {
             }
         }
     }
+    
+    // Handle incoming messages
+    func session(_ session: WCSession, didReceiveMessage message: [String : Any], replyHandler: @escaping ([String : Any]) -> Void) {
+        if let request = message["requestSamplingRate"] as? Bool, request == true {
+            replyHandler(["samplingRate": self.samplingRate])
+        }
+        
+        // Handle other messages
+    }
 }
 

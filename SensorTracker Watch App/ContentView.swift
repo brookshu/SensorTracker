@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct ContentView: View {
-    
     @State private var isRecording = false
     @State var samplingRate: Double = 25.0
     
@@ -22,6 +21,15 @@ struct ContentView: View {
     // workout manager
     @StateObject private var workoutManager = WorkoutManager()
 
+    // For displaying alerts
+    @State private var showAlert = false
+    @State private var alertMessage = ""
+
+    // Define sampling rate options
+    let minSamplingRate: Double = 10.0
+    let maxSamplingRate: Double = 100.0
+    let step: Double = 5.0
+    
     var body: some View {
         VStack {
             Spacer()
@@ -50,6 +58,78 @@ struct ContentView: View {
             Spacer()
          }
         .padding(.horizontal, 5)
+        
+        
+         // Sampling Rate Stepper
+         VStack(spacing: 20) {
+             Text("Sampling Rate")
+                 .font(.headline)
+                 .foregroundColor(.white)
+             
+             HStack(spacing: 20) {
+                 // Decrement Button
+                 Button(action: {
+                     decrementSamplingRate()
+                 }) {
+                     Image(systemName: "minus.circle.fill")
+                         .resizable()
+                         .frame(width: 40, height: 40)
+                         .foregroundColor(samplingRate > minSamplingRate ? .blue : .gray)
+                 }
+                 .disabled(samplingRate <= minSamplingRate)
+                 
+                 // Current Sampling Rate Display
+                 Text("\(Int(samplingRate)) Hz")
+                     .font(.title)
+                     .foregroundColor(.white)
+                     .frame(width: 100, height: 50)
+                     .background(
+                         RoundedRectangle(cornerRadius: 10)
+                             .fill(Color.gray.opacity(0.3))
+                     )
+                 
+                 // Increment Button
+                 Button(action: {
+                     incrementSamplingRate()
+                 }) {
+                     Image(systemName: "plus.circle.fill")
+                         .resizable()
+                         .frame(width: 40, height: 40)
+                         .foregroundColor(samplingRate < maxSamplingRate ? .blue : .gray)
+                 }
+                 .disabled(samplingRate >= maxSamplingRate)
+             }
+         }
+        .onAppear {
+            // Initialize the picker with the current sampling rate
+            self.samplingRate = connectivityManager.samplingRate
+        }
+        .alert(isPresented: $showAlert) {
+            Alert(title: Text("Sampling Rate"), message: Text(alertMessage), dismissButton: .default(Text("OK")))
+        }
+
+        Spacer()
+    }
+    
+    private func incrementSamplingRate() {
+        let newRate = samplingRate + step
+        if newRate <= maxSamplingRate {
+            samplingRate = newRate
+            notify(samplingRate)
+        }
+    }
+    
+    private func decrementSamplingRate() {
+        let newRate = samplingRate - step
+        if newRate >= minSamplingRate {
+            samplingRate = newRate
+            notify(samplingRate)
+        }
+    }
+    
+    private func notify(_ rate: Double) {
+        self.alertMessage = "Sampling rate updated to \(Int(rate)) Hz"
+        self.showAlert = true
     }
     
     private func start() {

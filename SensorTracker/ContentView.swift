@@ -44,15 +44,22 @@ struct ContentView: View {
     // phone
     @State var phoneCnt = 0
     @State var phonePrevTime: TimeInterval = NSDate().timeIntervalSince1970
-    @State var phoneSetFrequency: Double? = 25.0
     @State var phoneMeasuredFrequency: Double? = 25.0
     
     // watch
     @State var watchCnt = 0
     @State var watchPrevTime: TimeInterval = NSDate().timeIntervalSince1970
-    @State var watchSetFrequency: Double? = 25.0
     @State var watchMeasuredFrequency: Double? = 25.0
         
+    @State private var localSamplingRate: Double = 25.0 {
+         didSet {
+             // Update SessionManager's sampling rate
+             sessionManager.watchSetFrequency = localSamplingRate
+             // Send the updated sampling rate to the watch
+             sessionManager.sendSamplingRate(localSamplingRate)
+         }
+     }
+    
     init() {
     }
     
@@ -60,7 +67,6 @@ struct ContentView: View {
     @State var socketClient: SocketClient?
     
     var body: some View {
-        
         ZStack{
             Color(Color.black)
                 .ignoresSafeArea()
@@ -165,7 +171,22 @@ struct ContentView: View {
                         
                     }.padding()
                 }
-
+                
+                VStack(alignment: .leading) {
+                    Text("Sampling Rate: \(Int(localSamplingRate)) Hz")
+                        .font(.headline)
+                        .foregroundColor(.white)
+                    
+                    Slider(value: $localSamplingRate, in: 10...100, step: 5)
+                        .accentColor(.blue)
+                        .padding(.horizontal)
+                    
+                    // Optionally, display the current sampling rate
+                    Text("Current Sampling Rate: \(Int(localSamplingRate)) Hz")
+                        .font(.subheadline)
+                        .foregroundColor(.gray)
+                }.padding()
+                
                 Spacer()
                 
                 Text("Devices")
@@ -240,6 +261,11 @@ struct ContentView: View {
                 }.padding()
 
                 Spacer()
+            }
+            .onAppear {
+                // Load sampling rate from UserDefaults
+                let savedRate = UserDefaults.standard.double(forKey: "samplingRate")
+                self.localSamplingRate = savedRate > 0 ? savedRate : 60.0
             }
             .onTapGesture {
                 UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
@@ -320,11 +346,6 @@ struct ContentView: View {
     }
     
     func pairWatch() {
-        guard let watchSetFrequency = watchSetFrequency else {
-            watchStatusLabel = "Please set frequency first."
-            return
-        }
-        
         print("watch status")
         print("is watch app installed: ", WCSession.default.isWatchAppInstalled)
         print("is paired: ", WCSession.default.isPaired)
@@ -332,7 +353,7 @@ struct ContentView: View {
         
         if (WCSession.default.isReachable) {
             do {
-                try WCSession.default.updateApplicationContext(["samplingRate": watchSetFrequency])
+                try WCSession.default.updateApplicationContext(["samplingRate": localSamplingRate])
                 watchStatusLabel = "Connected!"
                 
                 // send IP address to watch
@@ -394,10 +415,7 @@ struct ContentView: View {
     
     func startPhoneMotion() {
         phoneMotionManager = CMMotionManager()
-        guard let phoneSetFrequency = phoneSetFrequency else {
-            return
-        }
-        phoneMotionManager.deviceMotionUpdateInterval = 1.0 / phoneSetFrequency
+        phoneMotionManager.deviceMotionUpdateInterval = 1.0 / localSamplingRate
         if phoneMotionManager.isDeviceMotionAvailable {
             phoneCnt = 0
             phonePrevTime = NSDate().timeIntervalSince1970
@@ -436,12 +454,32 @@ struct ContentView: View {
         self.phoneStatusLabel = "Not Recording..."
         phoneMotionManager.stopDeviceMotionUpdates()
     }
+    
+    
+    func sendSamplingRateToWatch() {
+        guard WCSession.default.isReachable else {
+            print("Watch is not reachable")
+            sessionManager.watchStatusLabel = "Watch not reachable"
+            return
+        }
+        
+        let context: [String: Any] = ["samplingRate": localSamplingRate]
+        
+        do {
+            try WCSession.default.updateApplicationContext(context)
+            print("Sent sampling rate: \(localSamplingRate) Hz")
+        } catch {
+            print("Error sending sampling rate: \(error.localizedDescription)")
+        }
+    }
 }
 
 class SessionManager: NSObject, ObservableObject, WCSessionDelegate {
     @Published var watchData: CMDeviceMotion?
     @Published var watchStatusLabel: String = "Not connected"
     @Published var watchCnt: Int = 0
+    @Published var connectionError: String?
+
     let nToMeasureFrequency = 100
     var watchPrevTime: TimeInterval = NSDate().timeIntervalSince1970
     var watchSetFrequency: Double? = 25.0
@@ -493,6 +531,54 @@ class SessionManager: NSObject, ObservableObject, WCSessionDelegate {
                 DispatchQueue.main.async {
                     self.watchStatusLabel = "\(self.watchCnt) data / \(round(self.watchMeasuredFrequency! * 100) / 100) [Hz]"
                 }
+            }
+        }
+    }
+    
+    // Handle incoming application contexts
+    func session(_ session: WCSession, didReceiveApplicationContext applicationContext: [String : Any]) {
+        DispatchQueue.main.async {
+            if let frequency = applicationContext["samplingRate"] as? Double {
+                self.watchSetFrequency = frequency
+                // Update the sampling rate in your MotionManager or relevant component
+                // For example:
+                // MotionManager.shared.setSamplingRate(value: frequency)
+                print("Received Sampling Rate: \(frequency) Hz")
+            }
+            
+            // Handle other keys if necessary
+        }
+    }
+    
+    // Handle incoming messages
+    func session(_ session: WCSession, didReceiveMessage message: [String : Any], replyHandler: @escaping ([String : Any]) -> Void) {
+        if let request = message["requestSamplingRate"] as? Bool, request == true {
+            replyHandler(["samplingRate": self.watchSetFrequency ?? 60.0])
+        }
+        
+        // Handle other messages
+    }
+    
+    // Add a method to send sampling rate to the Watch
+    func sendSamplingRate(_ rate: Double) {
+        guard WCSession.default.isReachable else {
+            print("Watch is not reachable")
+            DispatchQueue.main.async {
+                self.connectionError = "Watch is not reachable"
+            }
+            return
+        }
+        
+        let context: [String: Any] = ["samplingRate": rate]
+        
+        do {
+            try WCSession.default.updateApplicationContext(context)
+            print("Sent sampling rate: \(rate) Hz")
+            UserDefaults.standard.set(rate, forKey: "samplingRate")
+        } catch {
+            print("Error sending sampling rate: \(error.localizedDescription)")
+            DispatchQueue.main.async {
+                self.connectionError = "Failed to send sampling rate"
             }
         }
     }
