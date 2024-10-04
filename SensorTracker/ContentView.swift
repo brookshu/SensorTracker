@@ -265,7 +265,7 @@ struct ContentView: View {
             .onAppear {
                 // Load sampling rate from UserDefaults
                 let savedRate = UserDefaults.standard.double(forKey: "samplingRate")
-                self.localSamplingRate = savedRate > 0 ? savedRate : 60.0
+                self.localSamplingRate = savedRate > 0 ? savedRate : 25.0
             }
             .onTapGesture {
                 UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
@@ -553,7 +553,7 @@ class SessionManager: NSObject, ObservableObject, WCSessionDelegate {
     // Handle incoming messages
     func session(_ session: WCSession, didReceiveMessage message: [String : Any], replyHandler: @escaping ([String : Any]) -> Void) {
         if let request = message["requestSamplingRate"] as? Bool, request == true {
-            replyHandler(["samplingRate": self.watchSetFrequency ?? 60.0])
+            replyHandler(["samplingRate": self.watchSetFrequency ?? 25.0])
         }
         
         // Handle other messages
