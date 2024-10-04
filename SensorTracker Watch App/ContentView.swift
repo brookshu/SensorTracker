@@ -21,10 +21,6 @@ struct ContentView: View {
     // workout manager
     @StateObject private var workoutManager = WorkoutManager()
 
-    // For displaying alerts
-    @State private var showAlert = false
-    @State private var alertMessage = ""
-
     // Define sampling rate options
     let minSamplingRate: Double = 10.0
     let maxSamplingRate: Double = 100.0
@@ -115,7 +111,6 @@ struct ContentView: View {
         let newRate = samplingRate + step
         if newRate <= maxSamplingRate {
             samplingRate = newRate
-            notify(samplingRate)
         }
     }
     
@@ -123,14 +118,9 @@ struct ContentView: View {
         let newRate = samplingRate - step
         if newRate >= minSamplingRate {
             samplingRate = newRate
-            notify(samplingRate)
         }
     }
     
-    private func notify(_ rate: Double) {
-        self.alertMessage = "Sampling rate updated to \(Int(rate)) Hz"
-        self.showAlert = true
-    }
     
     private func start() {
         print("Starting...")
