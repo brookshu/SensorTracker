@@ -29,7 +29,7 @@ struct ContentView: View {
     @State private var headphoneStatusLabel = "N/A"
     
     // networking fields
-    @State private var socketIPField = "10.103.255.158"
+    @State private var socketIPField = "192.168.8.115"
     @State private var socketPortField = "8001"
 
     // managers

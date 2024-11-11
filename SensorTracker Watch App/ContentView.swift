@@ -21,7 +21,7 @@ struct ContentView: View {
     // workout manager
     @StateObject private var workoutManager = WorkoutManager()
 
-    // Define sampling rate options
+    // define sampling rate options
     let minSamplingRate: Double = 10.0
     let maxSamplingRate: Double = 100.0
     let step: Double = 5.0

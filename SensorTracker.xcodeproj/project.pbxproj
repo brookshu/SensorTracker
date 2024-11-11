@@ -346,25 +346,27 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "SensorTracker Watch App/SensorTracker Watch App.entitlements";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"SensorTracker Watch App/Preview Content\"";
-				DEVELOPMENT_TEAM = 7F684KFGV7;
+				DEVELOPMENT_TEAM = 64883753VV;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = SensorTracker;
+				INFOPLIST_KEY_CFBundleDisplayName = "Sensor Tracker";
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "This app needs access to HealthKit to read your health data like heart rate during workouts.";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "This app needs access to HealthKit to log and manage your workouts.";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = VascoXu.SensorTracker;
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "VascoXu.Sensor-Tracker";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = VascoXu.SensorTracker.watchkitapp;
+				PRODUCT_BUNDLE_IDENTIFIER = "VascoXu.Sensor-Tracker.watchkitapp";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -380,25 +382,27 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "SensorTracker Watch App/SensorTracker Watch App.entitlements";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"SensorTracker Watch App/Preview Content\"";
-				DEVELOPMENT_TEAM = 7F684KFGV7;
+				DEVELOPMENT_TEAM = 64883753VV;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = SensorTracker;
+				INFOPLIST_KEY_CFBundleDisplayName = "Sensor Tracker";
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "This app needs access to HealthKit to read your health data like heart rate during workouts.";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "This app needs access to HealthKit to log and manage your workouts.";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = VascoXu.SensorTracker;
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "VascoXu.Sensor-Tracker";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = VascoXu.SensorTracker.watchkitapp;
+				PRODUCT_BUNDLE_IDENTIFIER = "VascoXu.Sensor-Tracker.watchkitapp";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -417,10 +421,10 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"SensorTracker/Preview Content\"";
-				DEVELOPMENT_TEAM = 7F684KFGV7;
+				DEVELOPMENT_TEAM = 64883753VV;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = SensorTracker;
+				INFOPLIST_KEY_CFBundleDisplayName = "Sensor Tracker";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -432,7 +436,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = VascoXu.SensorTracker;
+				PRODUCT_BUNDLE_IDENTIFIER = "VascoXu.Sensor-Tracker";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -449,10 +453,10 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"SensorTracker/Preview Content\"";
-				DEVELOPMENT_TEAM = 7F684KFGV7;
+				DEVELOPMENT_TEAM = 64883753VV;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = SensorTracker;
+				INFOPLIST_KEY_CFBundleDisplayName = "Sensor Tracker";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -464,7 +468,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = VascoXu.SensorTracker;
+				PRODUCT_BUNDLE_IDENTIFIER = "VascoXu.Sensor-Tracker";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SWIFT_EMIT_LOC_STRINGS = YES;
