@@ -29,7 +29,7 @@ struct ContentView: View {
     @State private var headphoneStatusLabel = "N/A"
     
     // networking fields
-    @State private var socketIPField = "192.168.8.115"
+    @State private var socketIPField = "10.127.81.38"
     @State private var socketPortField = "8001"
 
     // managers
@@ -51,6 +51,11 @@ struct ContentView: View {
     @State var watchPrevTime: TimeInterval = NSDate().timeIntervalSince1970
     @State var watchMeasuredFrequency: Double? = 25.0
         
+    // headphone
+    @State var headphoneCnt = 0
+    @State var headphonePrevTime: TimeInterval = NSDate().timeIntervalSince1970
+    @State var headphoneMeasuredFrequency: Double? = 25.0
+    
     @State private var localSamplingRate: Double = 25.0 {
          didSet {
              // Update SessionManager's sampling rate
@@ -203,6 +208,7 @@ struct ContentView: View {
                         // airpods button
                         Button(action: {
                             self.isAirPodsSelected.toggle()
+                            toggleHeadphoneMotion()
                         }) {
                             Image(systemName: "airpods.gen3")
                                 .resizable()
@@ -303,6 +309,16 @@ struct ContentView: View {
             stopWatchMotion()
         }
     }
+    
+    func toggleHeadphoneMotion() {
+        print("Toggle Headphone...")
+        if self.isAirPodsSelected {
+            startHeadphoneMotion()
+        } else {
+            stopHeadphoneMotion()
+        }
+    }
+    
     
     private func updateSocketStatusLabel(status: Bool) {
         DispatchQueue.main.async {
@@ -455,6 +471,47 @@ struct ContentView: View {
         phoneMotionManager.stopDeviceMotionUpdates()
     }
     
+    
+    func startHeadphoneMotion() {
+        headphoneMotionManager = CMHeadphoneMotionManager()
+        if headphoneMotionManager.isDeviceMotionAvailable {
+            headphoneCnt = 0
+            headphonePrevTime = NSDate().timeIntervalSince1970
+            DispatchQueue.main.async {
+                self.headphoneStatusLabel = "Started!"
+            }
+            headphoneMotionManager.startDeviceMotionUpdates(to: headphoneQueue) { (motion, error) in
+                if let motion = motion {
+                    let currentTime = NSDate().timeIntervalSince1970
+                    if let socketClient = self.socketClient, socketClient.connection.state == .ready {
+                        let text = "headphone:\(currentTime) \(motion.timestamp) \(motion.userAcceleration.x) \(motion.userAcceleration.y) \(motion.userAcceleration.z) \(motion.attitude.quaternion.x) \(motion.attitude.quaternion.y) \(motion.attitude.quaternion.z) \(motion.attitude.quaternion.w)\n"
+                        socketClient.send(text: text)
+                    }
+                    self.headphoneCnt += 1
+                    if self.headphoneCnt % self.nToMeasureFrequency == 0 {
+                        let timeDiff = currentTime - self.headphonePrevTime
+                        self.headphonePrevTime = currentTime
+                        self.headphoneMeasuredFrequency = 1.0 / timeDiff * Double(self.nToMeasureFrequency)
+                        DispatchQueue.main.async {
+                            self.headphoneStatusLabel = "\(self.headphoneCnt) data / \(round(self.headphoneMeasuredFrequency! * 100) / 100) [Hz]"
+                        }
+                    }
+                } else {
+                    print("Something went wrong with headphone IMU")
+                    if let error = error { print(error) }
+                }
+            }
+        } else {
+            DispatchQueue.main.async {
+                self.headphoneStatusLabel = "Headphone motion not available"
+            }
+        }
+    }
+    
+    func stopHeadphoneMotion() {
+        self.headphoneStatusLabel = "Not Recording..."
+        headphoneMotionManager.stopDeviceMotionUpdates()
+    }
     
     func sendSamplingRateToWatch() {
         guard WCSession.default.isReachable else {
