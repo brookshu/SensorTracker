@@ -571,7 +571,7 @@ class SessionManager: NSObject, ObservableObject, WCSessionDelegate {
     }
     
     func session(_ session: WCSession, didReceiveMessage message: [String : Any] = [:]) {
-        if let motionData = message["motionData"] as? String {
+        if let motionData = (message["motionData"]) as? String {
             //self.watchData = motionData
             if let socketClient = self.socketClient {
                 if socketClient.connection.state == .ready {
@@ -579,16 +579,26 @@ class SessionManager: NSObject, ObservableObject, WCSessionDelegate {
                     socketClient.send(text: text)
                 }
             }
-            watchCnt += 1
-            if watchCnt % nToMeasureFrequency == 0 {
-                let currentTime = NSDate().timeIntervalSince1970
-                let timeDiff = (currentTime - self.watchPrevTime) as Double
-                watchPrevTime = currentTime
-                watchMeasuredFrequency = 1.0 / timeDiff * Double(nToMeasureFrequency)
-                DispatchQueue.main.async {
-                    self.watchStatusLabel = "\(self.watchCnt) data / \(round(self.watchMeasuredFrequency! * 100) / 100) [Hz]"
+            DispatchQueue.main.async {
+                    self.watchCnt += 1
+
+                    if self.watchCnt % self.nToMeasureFrequency == 0 {
+                        let currentTime = NSDate().timeIntervalSince1970
+                        let timeDiff = (currentTime - self.watchPrevTime)
+                        self.watchPrevTime = currentTime
+                        self.watchMeasuredFrequency = 1.0 / timeDiff * Double(self.nToMeasureFrequency)
+                        self.watchStatusLabel = "\(self.watchCnt) data / \(round(self.watchMeasuredFrequency! * 100) / 100) [Hz]"
+                    }
+                }
+        }
+        if let heartRateData = (message["heartRateData"]) as? String {
+            if let socketClient = self.socketClient {
+                if socketClient.connection.state == .ready {
+                    let text = "watchHR:" + heartRateData
+                    socketClient.send(text: text)
                 }
             }
+            print("iOS: HR data sent!")
         }
     }
     

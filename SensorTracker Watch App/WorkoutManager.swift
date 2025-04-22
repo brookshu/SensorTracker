@@ -7,10 +7,37 @@
 
 import Foundation
 import HealthKit
+import WatchConnectivity
+
 
 class WorkoutManager: NSObject, ObservableObject, HKWorkoutSessionDelegate, HKLiveWorkoutBuilderDelegate {
     func workoutBuilder(_ workoutBuilder: HKLiveWorkoutBuilder, didCollectDataOf collectedTypes: Set<HKSampleType>) {
+        guard let heartRateType = HKObjectType.quantityType(forIdentifier: .heartRate),
+            collectedTypes.contains(heartRateType),
+            let statistics = workoutBuilder.statistics(for: heartRateType),
+            let quantity = statistics.mostRecentQuantity() else {
+            return
+        }
+
+        let heartRateUnit = HKUnit.count().unitDivided(by: HKUnit.minute())
+        let heartRate = quantity.doubleValue(for: heartRateUnit)
+        let timestamp = NSDate().timeIntervalSince1970
         
+        let heartRateString = "\(timestamp) \(heartRate) \n"
+        //print(heartRateString)
+        
+        if WCSession.default.isReachable {
+            WCSession.default.sendMessage(
+                ["heartRateData": heartRateString],
+                replyHandler: nil,
+                errorHandler: { error in
+                    print("Error sending heart rate data: \(error.localizedDescription)")
+                }
+            )
+            print("HR data sent.")
+        } else {
+            print("WCSession is not activated.")
+        }
     }
     
     @Published var workoutSession: HKWorkoutSession?
@@ -43,11 +70,13 @@ class WorkoutManager: NSObject, ObservableObject, HKWorkoutSessionDelegate, HKLi
             sessionBuilder = workoutSession?.associatedWorkoutBuilder()
             workoutSession?.delegate = self
             sessionBuilder?.delegate = self
-
+            sessionBuilder?.dataSource = HKLiveWorkoutDataSource(healthStore: healthStore, workoutConfiguration: configuration)
             workoutSession?.startActivity(with: Date())
             sessionBuilder?.beginCollection(withStart: Date(), completion: { (success, error) in
                 if let error = error {
                     print("Error starting workout session: \(error.localizedDescription)")
+                } else {
+                    print("Workout started!")
                 }
             })
         } catch {
@@ -57,17 +86,27 @@ class WorkoutManager: NSObject, ObservableObject, HKWorkoutSessionDelegate, HKLi
 
     func endWorkout() {
         workoutSession?.end()
-        sessionBuilder?.endCollection(withEnd: Date(), completion: { (success, error) in
-            if let error = error {
-                print("Error ending workout session: \(error.localizedDescription)")
+            sessionBuilder?.endCollection(withEnd: Date()) { [weak self] (success, error) in
+                if let error = error {
+                    print("Error ending workout session: \(error.localizedDescription)")
+                } else {
+                    self?.sessionBuilder?.finishWorkout { (workout, error) in
+                        if let error = error {
+                            print("Error finishing workout: \(error.localizedDescription)")
+                        } else {
+                            print("Workout finished!")
+                        }
+                    }
+                }
             }
-        })
     }
 
     // MARK: - HKWorkoutSessionDelegate
 
     func workoutSession(_ workoutSession: HKWorkoutSession, didChangeTo toState: HKWorkoutSessionState, from fromState: HKWorkoutSessionState, date: Date) {
         // Handle state changes if necessary
+        print("Workout session changed from \(fromState.rawValue) to \(toState.rawValue) at \(date)")
+
     }
 
     func workoutSession(_ workoutSession: HKWorkoutSession, didFailWithError error: Error) {

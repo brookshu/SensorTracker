@@ -13,6 +13,7 @@ class WatchConnectivityManager: NSObject, ObservableObject, WCSessionDelegate {
 
     var motionManager = MotionManager()
     var audioManager = AudioManager()
+    var workoutManager = WorkoutManager()
     
     @Published var recordingText: String = "Not recording..."
     @Published var samplingRate: Double = 25.0
@@ -24,6 +25,7 @@ class WatchConnectivityManager: NSObject, ObservableObject, WCSessionDelegate {
         super.init()
         motionManager = MotionManager()
         audioManager = AudioManager()
+        workoutManager = WorkoutManager()
         if WCSession.isSupported() {
             let session = WCSession.default
             session.delegate = self
@@ -64,16 +66,18 @@ class WatchConnectivityManager: NSObject, ObservableObject, WCSessionDelegate {
             if let command = applicationContext["command"] as? String {
                 switch command {
                 case "start":
-                    print("Starting...")
+                    print("WatchManager: Starting...")
                     self.recordingText = "Recording..."
                     self.motionManager.setSamplingRate(value: self.samplingRate)
                     self.motionManager.startRecording()
                     self.audioManager.startRecording()
+                    self.workoutManager.startWorkout()
                 case "stop":
                     print("Watch Ending...")
                     self.recordingText = "Not recording..."
                     self.motionManager.stopRecording()
                     self.audioManager.stopRecording()
+                    self.workoutManager.endWorkout()
                 default:
                     break
                 }
